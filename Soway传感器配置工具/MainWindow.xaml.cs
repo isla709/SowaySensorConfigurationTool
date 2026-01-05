@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO.Ports;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -86,6 +87,8 @@ namespace Soway传感器配置工具
                 CommPort = new SerialPort();
                 CommPort.PortName = cb_port!.SelectedValue.ToString();
                 CommPort.BaudRate = int.Parse(cb_baud!.SelectedValue.ToString()!);
+                CommPort.ReadTimeout = 2000;
+                CommPort.DataReceived += CommPort_DataReceived;
                 CommPort.Open();
             }
             else
@@ -93,6 +96,7 @@ namespace Soway传感器配置工具
                 btn_PortSwitch.Tag = false;
                 if(CommPort!.IsOpen)
                 {
+                    CommPort.DataReceived -= CommPort_DataReceived;
                     CommPort.Close();
                     CommPort.Dispose();
                 }
@@ -112,7 +116,18 @@ namespace Soway传感器配置工具
 
         }
 
-        private void btn_FindDevice_Click(object sender, RoutedEventArgs e)
+        List<byte> RecvPortData = new List<byte>();
+        private void CommPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            int DataSize = CommPort.BytesToRead;
+            byte[] RecvData = new byte[DataSize];
+            CommPort.Read(RecvData, 0, DataSize);
+            RecvPortData = RecvData.ToList();
+            waitPortRecvSignal.Set();
+        }
+
+        ManualResetEventSlim waitPortRecvSignal = new ManualResetEventSlim(false);
+        private async void btn_FindDevice_Click(object sender, RoutedEventArgs e)
         {
             if (CommPort == null) {
                 MessageBox.Show("请先打开端口");
@@ -120,6 +135,7 @@ namespace Soway传感器配置工具
             }
             if (CommPort?.IsOpen == true) 
             {
+                
                 for (int i = 0; i < MBData_Addrs.Length; i++)
                 {
                     string FindDeviceCmd = MBData_Addrs[i];
@@ -129,7 +145,18 @@ namespace Soway传感器配置工具
                     FindDeviceCmd += "0001";
                     FindDeviceCmd = ModbusAsciiLrcHelper.GenerateCompleteAsciiCmdWithLrc(FindDeviceCmd);
                     Trace.WriteLine("尝试发送指令:" + FindDeviceCmd);
+                    CommPort.Write(FindDeviceCmd);
 
+                    waitPortRecvSignal.Reset();
+                    await Task.Run(() => 
+                    {
+                        waitPortRecvSignal.Wait(5000);
+
+                    });
+
+                    string RecvDataStr = "";
+                    RecvPortData.ForEach(x => { RecvDataStr += x; });
+                    Trace.WriteLine("接收到:" + RecvDataStr);
 
 
                 }

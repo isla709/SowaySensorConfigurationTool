@@ -66,7 +66,7 @@ namespace Soway传感器配置工具
         /// <summary>
         /// 辅助方法：十六进制字符串 → 字节数组（如"01030001" → [0x01,0x03,0x00,0x01]）
         /// </summary>
-        private static byte[] StringToHexBytes(string hexStr)
+        public static byte[] StringToHexBytes(string hexStr)
         {
             hexStr = hexStr.Replace(" ", "").Trim();
             if (hexStr.Length % 2 != 0)
