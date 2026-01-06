@@ -139,7 +139,20 @@ namespace Soway传感器配置工具
                 CommPort.BaudRate = int.Parse(cb_baud!.SelectedValue.ToString()!);
                 CommPort.ReadTimeout = 2000;
                 CommPort.DataReceived += CommPort_DataReceived;
-                CommPort.Open();
+                try
+                {
+                    CommPort.Open();
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("打开串口失败:" + ex.Message);
+                    btn_PortSwitch.Tag = false;
+                    btn_reloadports.IsEnabled = true;
+                    cb_port!.IsEnabled = true;
+                    cb_baud!.IsEnabled = true;
+                    return;
+                }
             }
             else
             {

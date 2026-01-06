@@ -16,10 +16,10 @@
         
         <UniformGrid Columns="3">
             <GroupBox Header="原始AD值" Margin="5">
-                <TextBlock x:Name="tb_ADValue" Text=""/>
+                <TextBlock x:Name="tb_ADValue" Text="" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"/>
             </GroupBox>
             <GroupBox Header="原始AD值(HEX)" Margin="5">
-                <TextBlock x:Name="tb_ADValueHex" Text=""/>
+                <TextBlock x:Name="tb_ADValueHex" Text="" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"/>
             </GroupBox>
             <Button x:Name="btn_StartGetValue" Content="启动采集" Margin="7" Click="btn_StartGetValue_Click"/>
         </UniformGrid>

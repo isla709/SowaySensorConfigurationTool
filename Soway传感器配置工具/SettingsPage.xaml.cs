@@ -166,5 +166,65 @@ namespace Soway传感器配置工具
 
 
         }
+
+        private async void SetFilteringButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainWindow == null)
+            {
+                return;
+            }
+            if (mainWindow.CommPort == null)
+            {
+                return;
+            }
+            if (mainWindow.currentDeviceAddr == "请重新搜索" || mainWindow.currentDeviceAddr == "N/D")
+            {
+                MessageBox.Show("请先搜索设备获取当前地址！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (mainWindow.CommPort!.IsOpen == true)
+            {
+                string TargetFiltering = (FilteringCombobox.SelectedValue as ComboBoxItem)!.Tag.ToString()!;
+                string DeviceCmd = mainWindow.currentDeviceAddr;
+                DeviceCmd += mainWindow.MBData_Functions[1];
+                DeviceCmd += mainWindow.currentDeviceAddr;
+                DeviceCmd += "35";
+                DeviceCmd += "0001";
+                DeviceCmd += "02";
+                DeviceCmd += "00";
+                DeviceCmd += TargetFiltering;
+                string CompleteCmd = ModbusAsciiLrcHelper.GenerateCompleteAsciiCmdWithLrc(DeviceCmd);
+                AddLog("----------------------------------------------------------------------------");
+                AddLog("发送指令:" + CompleteCmd);
+                mainWindow.CommPort.Write(CompleteCmd);
+                mainWindow.waitPortRecvSignal.Reset();
+                mainWindow.RecvPortData.Clear();
+                await Task.Run(() =>
+                {
+                    mainWindow.waitPortRecvSignal.Wait(5000);
+
+                });
+                string RecvDataStr = Encoding.ASCII.GetString(mainWindow.RecvPortData.ToArray());
+                AddLog("接收到:" + RecvDataStr);
+                if(RecvDataStr.StartsWith(':')) 
+                {
+                    string RecvAddr = RecvDataStr.Substring(1, 2);
+                    string RecvFunction = RecvDataStr.Substring(3, 2);
+                    string RecvMsgID = RecvDataStr.Substring(7, 2);
+                    Trace.WriteLine($"接收到设备响应:{RecvAddr},功能码:{RecvFunction},消息ID:{RecvMsgID}");
+                    if(RecvAddr == mainWindow.currentDeviceAddr && RecvFunction == "10" && RecvMsgID == "35") 
+                    {
+                        MessageBox.Show("设置成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("设置失败，设备响应错误！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+
+
+                }
+            }
+        }
     }
 }
