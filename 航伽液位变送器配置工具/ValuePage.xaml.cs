@@ -157,17 +157,22 @@ namespace 航伽液位变送器配置工具
 
                         UInt16 rawValue = (UInt16)(mainWindow.RecvPortData[3] << 8 | mainWindow.RecvPortData[4]);
 
+                        float displayValue = rawValue;
+
+                        
+
                         await Dispatcher.BeginInvoke(() =>
                         {
                             tb_ADValueHex.Text = rawValueHex;
-
-                            float displayValue = rawValue;
+    
                             for (int i = 0; i < DeviceDecimalplaces; i++)
                             {
                                 displayValue = displayValue / 10.0f;
                             }
                             tb_ADValue.Text = displayValue.ToString("F3") + " " + UnitStrs[DeviceUnit];
                         });
+
+                        mainWindow.CurrentDeviceADValue = displayValue;
 
                     }
 

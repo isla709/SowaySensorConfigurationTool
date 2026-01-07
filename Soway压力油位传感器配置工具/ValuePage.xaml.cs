@@ -98,6 +98,7 @@ namespace Soway传感器配置工具
                         string Value_HEX = RecvDataStr.Substring(11, 4);
                         ushort Value_U16 = Convert.ToUInt16(Value_HEX, 16);
 
+                        mainWindow.CurrentDeviceADValue = Value_U16;
                         mainWindow.DeviceADValue.Add(Value_U16);
 
                         await Dispatcher.BeginInvoke(() =>

@@ -70,6 +70,9 @@
             <TabItem Header="实时数据读取">
                 <Frame x:Name="Frame_ValuePage" Source="ValuePage.xaml" NavigationUIVisibility="Hidden"/>
             </TabItem>
+            <TabItem Header="标定记录">
+                <Frame x:Name="Frame_CalibrationPage" Source="CalibrationPage.xaml" NavigationUIVisibility="Hidden"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

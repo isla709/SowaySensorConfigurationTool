@@ -31,6 +31,8 @@ namespace Soway传感器配置工具
 
         internal List<ushort> DeviceADValue = new List<ushort>();
 
+        internal ushort CurrentDeviceADValue = 0;
+
         public MainWindow()
         {
             InitializeComponent();

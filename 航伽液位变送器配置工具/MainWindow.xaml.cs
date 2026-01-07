@@ -24,12 +24,11 @@ namespace 航伽液位变送器配置工具
         internal SerialPort? CommPort = null;
 
 
-
-
-
         internal string currentDeviceAddr = "N/D";
 
         internal List<ushort> DeviceADValue = new List<ushort>();
+
+        internal float CurrentDeviceADValue = 0;
 
         public MainWindow()
         {
